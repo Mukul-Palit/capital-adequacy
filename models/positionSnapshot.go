@@ -1,42 +1,50 @@
 package models
 
 import (
-	database "capital-adequacy/driver"
-	"fmt"
+	database "airflow-report/capital-adequacy/driver"
 
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //blank
 )
 
+type Pos interface {
+	GetPositionSnapshot() (PositionSnapshot, error)
+}
+
+type Position struct {
+	DB *gorm.DB
+}
+
 //PositionSnapshot : Structure for the var table
 type PositionSnapshot struct {
-	ID        string  `gorm:"type:bigint(8);PRIMARY_KEY"`
-	Timestamp string  `gorm:"type:datetime;NOT NULL"`
-	Alpha     string  `gorm:"type:varchar(255);NOT NULL"`
-	Days      string  `gorm:"type:varchar(255);NOT NULL"`
-	Label     string  `gorm:"type:varchar(255);NOT NULL"`
-	Exposure  float64 `gorm:"type:float;NOT NULL"`
-	Var       float64 `gorm:"type:float;NOT NULL"`
+	ID        string  `gorm:"type:bigint(8);PRIMARY_KEY" json:"id"`
+	Timestamp string  `gorm:"type:datetime;NOT NULL" json:"ts"`
+	Alpha     string  `gorm:"type:varchar(255);NOT NULL" json:"alpha"`
+	Days      string  `gorm:"type:varchar(255);NOT NULL" json:"days"`
+	Label     string  `gorm:"type:varchar(255);NOT NULL" json:"label"`
+	Exposure  float64 `gorm:"type:float;NOT NULL" json:"exposure"`
+	Var       float64 `gorm:"type:float;NOT NULL" json:"Var"`
 }
 
 //GetPositionSnapshot : returns 1 row that matches the condition
-func GetPositionSnapshot() PositionSnapshot {
+func (p *Position) GetPositionSnapshot() (PositionSnapshot, error) {
 	var positionSnapshot PositionSnapshot
-	db := database.DbConn()
-	defer func() {
-		err := db.Close()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}()
 	var id, timestamp, alpha, days, label string
 	var exposure, Var float64
-	//fmt.Println(db.Table("var").Where("alpha = 0.99 AND days = 1 AND label = 'Warehouse-2011Parametric'").Order("ts desc").Take(&positionSnapshot).QueryExpr())
-	//fmt.Println(db.Table("var").Order("id desc").Limit(1).Where("alpha = 0.99 AND days = 1 AND label = 'Warehouse-2011Parametric'").Select("id,ts,alpha,days,label,exposure,var").First(&positionSnapshot).QueryExpr())
-	row := db.Table("var").Order("id desc").Limit(1).Where("alpha = 0.99 AND days = 1 AND label = 'Warehouse-2011Parametric'").Select("id,ts,alpha,days,label,exposure,var").First(&positionSnapshot).Row()
-	row.Scan(&id, &timestamp, &alpha, &days, &label, &exposure, &Var)
-	// fmt.Println(id, timestamp, alpha, days, label, exposure, Var)
+	row, err := p.DB.Table("var").Order("id desc").Limit(1).Where("alpha = 0.99 AND days = 1 AND label = 'Warehouse-2011Parametric'").Select("id,ts,alpha,days,label,exposure,var").Rows()
+	defer row.Close()
+	if err != nil {
+		database.WriteLogFile(err)
+	}
+	for row.Next() {
+		row.Scan(&id, &timestamp, &alpha, &days, &label, &exposure, &Var)
+	}
 	positionSnapshot = PositionSnapshot{ID: id, Timestamp: timestamp, Alpha: alpha, Days: days, Label: label, Exposure: exposure, Var: Var}
-	//fmt.Println(positionSnapshot)
-	return positionSnapshot
+	return positionSnapshot, err
+}
+
+func CreatePositionSnapshot(db *gorm.DB) Pos {
+	return &Position{
+		DB: db,
+	}
 }

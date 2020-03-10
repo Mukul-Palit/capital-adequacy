@@ -1,10 +1,9 @@
 package provider
 
 import (
-	database "capital-adequacy/driver"
-	models "capital-adequacy/models"
-	"fmt"
-	"math"
+	database "airflow-report/capital-adequacy/driver"
+	metrics "airflow-report/capital-adequacy/metrics"
+	models "airflow-report/capital-adequacy/models"
 	"time"
 )
 
@@ -20,15 +19,15 @@ func GetCurrentRealisedPnL() models.Money {
 	db := database.DbConn()
 	s := models.CreateSymExposure(db)
 	symbolExposure, err := s.GetSymExposure()
-	if isSymbolExposureFresh(symbolExposure.Timestamp) {
-		fmt.Println("Hello")
-	}
+	symbolExposureAge(symbolExposure.Timestamp)
 	if err != nil {
-		fmt.Println(err)
+		database.WriteLogFile(err)
 	}
-	db = database.DbConn()
-	s = models.CreateSymExposure(db)
-	realisedPnlFloat, err := models.GetSumRealisedPnl()
+	realisedPnlFloat, err := s.GetSumRealisedPnl()
+	if err != nil {
+		database.WriteLogFile(err)
+	}
+
 	realisedPnlMoney := convertRealisedPnlFloatToMoney(realisedPnlFloat)
 	return realisedPnlMoney
 }
@@ -39,17 +38,14 @@ func convertRealisedPnlFloatToMoney(realisedPnlFloat float64) models.Money {
 	return realisedPnlMoney
 }
 
-func isSymbolExposureFresh(ts string) bool {
-	//symbolExposureTimeStamp := ts
+func symbolExposureAge(ts string) int {
 	symbolExposureTimeStamp, err := time.Parse("2006-01-02 15:04:05", ts)
 
 	if err != nil {
-		fmt.Println(err)
+		database.WriteLogFile(err)
 	}
-	thresholdDateTime := time.Now().Add(time.Duration(-ThresholdValue) * time.Minute)
-	//fmt.Println(thresholdDateTime)
-	agee := time.Since(symbolExposureTimeStamp)
-	age := (int)(math.Round(agee.Hours() * 0.041666667))
-	fmt.Printf("Age : %d days\n", age)
-	return symbolExposureTimeStamp.After(thresholdDateTime)
+	exposureAge := time.Since(symbolExposureTimeStamp)
+	age := (int)(exposureAge.Hours() * 0.041666667)
+	metrics.CalculateSymbolAge(age)
+	return age
 }

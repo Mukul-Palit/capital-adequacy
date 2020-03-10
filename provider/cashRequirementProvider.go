@@ -1,7 +1,8 @@
 package provider
 
 import (
-	models "capital-adequacy/models"
+	database "airflow-report/capital-adequacy/driver"
+	models "airflow-report/capital-adequacy/models"
 )
 
 //ThresholdValue : Threshold value for the job run
@@ -10,10 +11,12 @@ import (
 //GetLatest :
 func GetLatest() models.CashRequirement {
 	var cashRequirement models.CashRequirement
-	cashRequirement = models.GetCashRequirement()
-	//fmt.Println(latestPositionSnapshot)
+	db := database.DbConn()
+	c := models.CreateCashRequirement(db)
+	cashRequirement, err := c.GetCashRequirement()
+	if err != nil {
+		database.WriteLogFile(err)
+	}
 	return cashRequirement
 
 }
-
-

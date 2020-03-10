@@ -1,8 +1,9 @@
 package provider
 
 import (
-	models "capital-adequacy/models"
-	"fmt"
+	database "airflow-report/capital-adequacy/driver"
+	metrics "airflow-report/capital-adequacy/metrics"
+	models "airflow-report/capital-adequacy/models"
 	"time"
 )
 
@@ -12,20 +13,24 @@ import (
 //GetCurrentPositionSnapshot :
 func GetCurrentPositionSnapshot() models.PositionSnapshot {
 	var positionSnapshot models.PositionSnapshot
-	positionSnapshot = models.GetPositionSnapshot()
-	if isPositionSnapshotFresh(positionSnapshot.Timestamp) {
-		//fmt.Println("Hello")
+	db := database.DbConn()
+	p := models.CreatePositionSnapshot(db)
+	positionSnapshot, err := p.GetPositionSnapshot()
+	if err != nil {
+		database.WriteLogFile(err)
 	}
-	//fmt.Println(latestPositionSnapshot)
+	positionSnapshotAge(positionSnapshot.Timestamp)
 	return positionSnapshot
 
 }
-func isPositionSnapshotFresh(ts string) bool {
+func positionSnapshotAge(ts string) int {
 	positionSnapshotTimeStamp, err := time.Parse("2006-01-02 15:04:05", ts)
 	if err != nil {
-		fmt.Println(err)
+		database.WriteLogFile(err)
 	}
-	thresholdDateTime := time.Now().Add(time.Duration(-ThresholdValue) * time.Minute)
-	//fmt.Println(thresholdDateTime)
-	return positionSnapshotTimeStamp.After(thresholdDateTime)
+	//thresholdDateTime := time.Now().Add(time.Duration(-ThresholdValue) * time.Minute)
+	positionAge := time.Since(positionSnapshotTimeStamp)
+	age := (int)(positionAge.Hours() * 0.041666667)
+	metrics.CalculatePositionAge(age)
+	return age
 }

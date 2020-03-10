@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	database "airflow-report/capital-adequacy/driver"
 	"fmt"
 	"os"
 
@@ -39,7 +40,7 @@ var RootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := RootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		database.WriteLogFile(err)
 		os.Exit(-1)
 	}
 }

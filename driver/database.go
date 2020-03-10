@@ -2,9 +2,10 @@ package driver
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"runtime"
 
-	_ "github.com/go-sql-driver/mysql" //blank import
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 )
@@ -23,4 +24,25 @@ func DbConn() (db *gorm.DB) {
 		fmt.Println(err)
 	}
 	return db
+}
+
+//WriteLogFile : error logging
+func WriteLogFile(err error) {
+	f := OpenLogFile()
+	pc, fn, line, _ := runtime.Caller(1)
+	fmt.Println(err)
+	fmt.Println(pc, fn, line)
+	log.SetOutput(f)
+	log.Printf("[error] in %s[%s:%d] %v", runtime.FuncForPC(pc).Name(), fn, line, err)
+	defer f.Close()
+}
+
+// OpenLogFile : this function will open log file and return the file writer
+func OpenLogFile() (f *os.File) {
+	f, err := os.OpenFile("logs/output.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+		return
+	}
+	return f
 }

@@ -1,0 +1,14 @@
+2020/03/05 16:00:38 [error] in airflow-report/capital-adequacy/cmd.Execute[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/cmd/root.go:43] <nil>
+2020/03/05 16:00:52 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:40] <nil>
+2020/03/05 16:00:58 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:40] <nil>
+2020/03/05 16:01:04 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:40] <nil>
+2020/03/05 16:01:10 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:40] <nil>
+2020/03/05 16:43:18 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:43] NoCredentialProviders: no valid providers in chain. Deprecated.
+	For verbose messaging see aws.Config.CredentialsChainVerboseErrors
+2020/03/05 16:43:24 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:43] NoCredentialProviders: no valid providers in chain. Deprecated.
+	For verbose messaging see aws.Config.CredentialsChainVerboseErrors
+2020/03/05 16:43:32 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:43] NoCredentialProviders: no valid providers in chain. Deprecated.
+	For verbose messaging see aws.Config.CredentialsChainVerboseErrors
+2020/03/05 16:43:38 [error] in airflow-report/capital-adequacy/handler.PutmetricData[/home/local/SLS/mukul.p/go/src/airflow-report/capital-adequacy/handler/handler.go:43] NoCredentialProviders: no valid providers in chain. Deprecated.
+	For verbose messaging see aws.Config.CredentialsChainVerboseErrors
+2020/03/06 08:30:54 [error] in airflow-report/capital-adequacy/models.(*Symbol).GetSymExposure[/home/ashutoshp/go/src/airflow-report/capital-adequacy/models/symbolExposure.go:40] sql: database is closed

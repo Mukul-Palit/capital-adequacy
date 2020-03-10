@@ -1,4 +1,4 @@
-package metrices
+package metrics
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"github.com/gookit/color"
 )
 
+//Monitor : Memory Usage monitor
 type Monitor struct {
 	Alloc,
 	TotalAlloc,
@@ -20,6 +21,7 @@ type Monitor struct {
 	NumGoroutine int
 }
 
+//NewMonitor : Calculate memory usage
 func NewMonitor() {
 	var m Monitor
 	var rtm runtime.MemStats
@@ -53,10 +55,9 @@ func NewMonitor() {
 	color.New(color.FgWhite, color.BgLightRed).Printf("\nLiveObjects = %v", m.Mallocs-m.Frees)
 	color.New(color.FgWhite, color.BgLightRed).Printf("\nPauseTotalNs = %v", m.PauseTotalNs)
 	color.New(color.FgWhite, color.BgLightRed).Printf("\nNumGC = %v", m.NumGC)
-	color.New(color.FgWhite, color.BgLightRed).Printf("\nNumGoroutine = %v", m.NumGoroutine)
+	color.New(color.FgWhite, color.BgLightRed).Printf("\nNumGoroutine = %v\n", m.NumGoroutine)
 }
 
-// color.New(color.FgWhite, color.BgLightRed).Println(string(b))
 func bToMb(b uint64) uint64 {
 	return b / 1024 / 1024
 }

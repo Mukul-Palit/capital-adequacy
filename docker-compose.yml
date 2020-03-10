@@ -1,0 +1,28 @@
+
+version: '3.1'
+services:
+  mysql-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    environment:
+      MYSQL_DRIVER: mysql
+      MYSQL_DATABASE: hello
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: hello987
+    ports:
+      - "3308:3306" 
+    volumes:
+      - db-data:/var/lib/mysql
+  golang-development:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql-development
+    links:
+      - mysql-development
+volumes:
+  db-data:
+    driver: local
+   
